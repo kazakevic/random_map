@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <title>Title</title>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <style>
+    #map {
+        height: 25em;
+        width: 100%;
+    }
+    </style>
+
+</head>
+<body>
+
+    <!-- MAP container -->
+    <div class="container-fluid">
+            <div id="map"></div>
+    </div>
+    <!-- MAP container -->
+
+
+    <!-- Controlls container -->
+    <div class="container mt-5">
+        <div class="row mb-5">
+        <div class="col">
+                </div>
+                <div class="col-md-4">
+                    <h4>Next set in: <span id="counter"></span></h4>
+                </div>
+
+                <div class="col">
+                </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12 form-inline mb-5">
+
+                    <div class="form-group col-xs-4 col-md-4 mr-5">
+                    <label for="lt">Latitude: </label> 
+                    <input type="text" class="form-control" id="lt" placeholder="" value="" readonly>
+                    </div>
+
+                    <div class="form-group col-xs-4 col-md-4">
+                    <label for="lg">Longitude: </label>
+                    <input type="text" class="form-control" id="lg" placeholder="" value="" readonly>
+                    </div>
+            </div>
+
+            <div class="col-md-12 mt-5">
+                    <div class="form-group col-xs-4 col-md-4">
+                    <label for="full_url">Full URL:</label>
+                    <input type="text" class="form-control" id="full_url" placeholder="" value="" readonly>
+                    </div>
+    
+                    <div class="form-group col-xs-4 col-md-4">
+                    <label for="short_url">Short URL</label>
+                    <input type="text" class="form-control" id="short_url" placeholder="" value="" readonly>
+                    </div>
+            </div>
+        </div>
+    </div>
+
+    
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBL-tsZ5vt-sKslMXopektxivvMHNUVp0A&callback=initMap"></script>
+
+
+<script>
+    //short urls when body loads
+    $( document ).ready(function() {
+        //get full url
+        url = $("#full_url").val();
+        shortUrl(url);
+        counter();
+        setInterval(function(){  
+            counter();
+                location.reload();
+    }, 30000);
+    });
+
+    //draw map with random coords
+    function initMap() {
+        var lg = getRandomInRange(-180,180,4);
+        var lt = getRandomInRange(-180,180,4);
+        $("#lt").val(lt);
+        $("#lg").val(lg);
+
+        $("#full_url").val(`https://www.google.com/maps/@${lt},${lg},8z?hl=en`);
+        console.log(lg, lt );
+        var myLatLng = {lat: lt, lng: lg};
+
+        var map = new google.maps.Map(document.getElementById('map'), {
+        zoom: 8,
+        center: myLatLng
+        });
+
+        var marker = new google.maps.Marker({
+        position: myLatLng,
+        map: map,
+        title: 'Random location'
+        });
+    
+    } 
+    //fuynction for random coords
+    function getRandomInRange(from, to, fixed) {
+        return (Math.random() * (to - from) + from).toFixed(fixed) * 1;
+    }
+    //google short url api
+    function shortUrl(url){
+        var req = $.ajax({
+        url: 'https://www.googleapis.com/urlshortener/v1/url?key=AIzaSyDJgrezo6yPosQzBxZCGspXOu1mvG9UjSA',
+            method: 'POST',
+            data: JSON.stringify( {
+                longUrl: url
+            }),
+            contentType: "application/json",
+            dataType: "json",
+            beforeSend: function(){
+                $("#short_url").val("Making short url...");
+            }
+        })
+        .done(function(data) {
+            $("#short_url").val(data.id);
+        })
+        .fail(function() {
+            return false;
+        })
+        .always(function() {
+            
+        }); 
+    }
+
+    function counter() {
+        for(var i=0; i<30; i++) {
+            var sno = i+1;
+            (function myLoop (i) {          
+                setTimeout(function () {   
+                    $("#counter").html(31-i);
+                }, 1000*i);
+            })(sno);
+        }
+    }
+
+</script>  
+
+</body>
+</html>
